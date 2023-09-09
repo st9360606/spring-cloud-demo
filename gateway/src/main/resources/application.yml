@@ -1,0 +1,39 @@
+server:
+  port: 10010
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    gateway:
+      routes:
+        - id: user-service   #路由標示
+          uri: lb://userservice #路由的目標地址
+          predicates: # 路由断言，判断请求是否符合规则
+            - Path=/user/** # 路径断言，判断路径是否是以/user开头，如果是则符合
+#          filters:       #局部過濾器
+#            - AddRequestHeader=Truth,Itcast is freaking awesome!
+        - id: order-service
+          uri: lb://orderservice
+          predicates:
+            - Path=/order/**
+      default-filters:    #路由過濾器
+        - AddRequestHeader=Truth,You are awesome!
+      globalcors:  #全局的跨域處理
+        add-to-simple-url-handler-mapping: true   #解決options請求被攔截的問題
+        corsConfigurations:
+          '[/**]': #允許哪些網站的跨域請求
+            allowedOrigins:
+              - "https://docs.spring.io"
+              - "http://localhost:8090"
+            allowedMethods: #允許的跨域ajax的請求方式
+              - GET
+              - "POST"
+              - "DELETE"
+              - "PUT"
+              - "OPTIONS"
+            allowHeaders: "*"  #是否允許帶請求頭信息
+            allowCredentials: true  #是否允許帶cookie
+            maxAge: 360000  #此次跨域的有效期
